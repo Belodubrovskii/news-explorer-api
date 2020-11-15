@@ -36,8 +36,9 @@ const deleteArticle = (req, res, next) => {
 
       const isOwner = article.owner.toString() === req.user._id.toString();
       if (isOwner) {
-        article.remove();
-        return res.send({ message: 'Статья удалена' });
+        return article.remove()
+          .then(() => res.send({ message: 'Статья удалена' }))
+          .catch(next);
       }
       return next(new ForbiddenError('Чужие статьи удалять нельзя!'));
     })
