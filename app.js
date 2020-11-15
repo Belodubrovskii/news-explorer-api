@@ -15,9 +15,9 @@ app.use(helmet());
 const usersRouter = require('./routes/users.js');
 const articlesRouter = require('./routes/articles.js');
 
-const { PORT = 3000, MONGO_ADDRESS } = process.env;
+const { PORT = 3000, MONGO_ADDRESS, NODE_ENV } = process.env;
 
-mongoose.connect(MONGO_ADDRESS, {
+mongoose.connect(NODE_ENV === 'production' ? MONGO_ADDRESS : 'mongodb://localhost:27017/newsdb', {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -52,7 +52,6 @@ app.use(errorLogger);
 
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
   const { statusCode = 500, message } = err;
@@ -65,6 +64,7 @@ app.use((err, req, res, next) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
+  next();
 });
 
 app.listen(PORT, () => {
